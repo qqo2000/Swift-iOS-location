@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install XcodeGen
         env:
@@ -65,7 +65,7 @@ jobs:
           ls -la ${{ env.PROJECT_NAME }}.ipa
 
       - name: Upload IPA
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: LocationSpoofer-ipa
           path: ${{ env.PROJECT_NAME }}.ipa
@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload build log
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-log
           path: build.log
@@ -81,7 +81,7 @@ jobs:
 
       - name: Release on tag
         if: startsWith(github.ref, 'refs/tags/') && success()
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.PROJECT_NAME }}.ipa
           name: ${{ github.ref_name }}
