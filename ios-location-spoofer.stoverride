@@ -1,0 +1,24 @@
+﻿name: iOS Location Spoofer
+desc: 劫持 Apple 定位封包，把坐标换成你想要的（Stash）。
+
+http:
+  script:
+    - match: ^https?:\/\/(?:gs-loc(?:-cn)?\.apple\.com|gsp-ssl\.ls\.apple\.com|bluedot\.is\.autonavi\.com(?:\.gds\.alibabadns\.com)?)\/clls\/wloc(?:\?.*)?$
+      name: ios-location-spoofer
+      type: response
+      require-body: true
+      binary-mode: true
+      max-size: 1048576
+      timeout: 10
+      argument: mode=response&latitude=43.65738&longitude=122.25281&horizontalAccuracy=39&verticalAccuracy=1000&altitude=530&debug=false&configUrl=https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/Resources/location-spoofer-config.json
+  mitm:
+    - gs-loc.apple.com
+    - gs-loc-cn.apple.com
+    - gsp-ssl.ls.apple.com
+    - bluedot.is.autonavi.com
+    - bluedot.is.autonavi.com.gds.alibabadns.com
+
+script-providers:
+  ios-location-spoofer:
+    url: https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/Resources/location-spoofer.js
+    interval: 86400

@@ -1,0 +1,8 @@
+﻿#!name=iOS Location Spoofer
+#!desc=透过 MITM 改写 Apple 定位回应的经纬度（Quantumult X）。
+
+[rewrite_local]
+^https?:\/\/(?:gs-loc(?:-cn)?\.apple\.com|gsp-ssl\.ls\.apple\.com|bluedot\.is\.autonavi\.com(?:\.gds\.alibabadns\.com)?)\/clls\/wloc(?:\?.*)?$ url script-response-body https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/Resources/location-spoofer-qx.js
+
+[mitm]
+hostname = gs-loc.apple.com, gs-loc-cn.apple.com, gsp-ssl.ls.apple.com, bluedot.is.autonavi.com, bluedot.is.autonavi.com.gds.alibabadns.com

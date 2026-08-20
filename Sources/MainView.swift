@@ -221,21 +221,17 @@ struct MainView: View {
 
     private var serverConfigSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("GitHub CDN 模块下载（推荐）").font(.caption.bold())
+            Text("模块下载（GitHub CDN 直连）").font(.caption.bold())
             configRow(title: "Shadowrocket", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer.sgmodule")
+            configRow(title: "Loon", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer.lnplugin")
+            configRow(title: "Surge", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer-surge.sgmodule")
+            configRow(title: "Stash", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer.stoverride")
+            configRow(title: "QX", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer.snippet")
             
             Text("本地服务器配置地址").font(.caption.bold()).padding(.top, 4)
             configRow(title: "Script-Path", value: "\(server.serverAddress)/js/location-spoofer.js?token=\(locationManager.token)")
             configRow(title: "ConfigUrl", value: "\(server.serverAddress)/loc.json?token=\(locationManager.token)")
             configRow(title: "状态页", value: "\(server.serverAddress)/status?token=\(locationManager.token)")
-
-            Text("本地模块下载").font(.caption.bold()).padding(.top, 4)
-            HStack(spacing: 4) {
-                moduleLink("Shadowrocket", ".sgmodule")
-                moduleLink("Loon", ".lnplugin")
-                moduleLink("Surge", ".sgmodule")
-                moduleLink("Stash", ".stoverride")
-            }
         }
         .padding(.horizontal, 12).padding(.bottom, 12)
         .background(Color(.systemGray6))
@@ -250,25 +246,6 @@ struct MainView: View {
                     .font(.caption2)
             }
             Spacer()
-        }
-    }
-
-    private func moduleLink(_ name: String, _ ext: String) -> some View {
-        let fileName: String
-        switch name {
-        case "Shadowrocket": fileName = "ios-location-spoofer-local.sgmodule"
-        case "Loon": fileName = "ios-location-spoofer-local.lnplugin"
-        case "Surge": fileName = "ios-location-spoofer-surge-local.sgmodule"
-        case "Stash": fileName = "ios-location-spoofer-local.stoverride"
-        default: fileName = ""
-        }
-        let url = "\(server.serverAddress)/local-module/\(fileName)?token=\(locationManager.token)"
-        return Button(action: { copyToClipboard(url) }) {
-            Text(name)
-                .font(.caption2)
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(6)
         }
     }
 
