@@ -49,9 +49,9 @@ class HTTPServer {
     }
 
     func start(port: Int) throws {
-        listenSocket = socket(AF_INET6, Int32(SOCK_STREAM.rawValue), 0)
+        listenSocket = socket(AF_INET6, SOCK_STREAM, 0)
         if listenSocket < 0 {
-            listenSocket = socket(AF_INET, Int32(SOCK_STREAM.rawValue), 0)
+            listenSocket = socket(AF_INET, SOCK_STREAM, 0)
         }
         if listenSocket < 0 {
             throw NSError(domain: "HTTPServer", code: 1, userInfo: [NSLocalizedDescriptionKey: "socket() failed"])
@@ -76,7 +76,7 @@ class HTTPServer {
         if bindResult < 0 {
             // Fallback to IPv4
             close(listenSocket)
-            listenSocket = socket(AF_INET, Int32(SOCK_STREAM.rawValue), 0)
+            listenSocket = socket(AF_INET, SOCK_STREAM, 0)
             var addr4 = sockaddr_in()
             addr4.sin_family = sa_family_t(AF_INET)
             addr4.sin_port = UInt16(port).bigEndian
