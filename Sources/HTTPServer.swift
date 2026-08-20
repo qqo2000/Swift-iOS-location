@@ -49,10 +49,7 @@ class HTTPServer {
     }
 
     func start(port: Int) throws {
-        listenSocket = socket(AF_INET6, SOCK_STREAM, 0)
-        if listenSocket < 0 {
-            listenSocket = socket(AF_INET, SOCK_STREAM, 0)
-        }
+        listenSocket = socket(AF_INET, SOCK_STREAM, 0)
         if listenSocket < 0 {
             throw NSError(domain: "HTTPServer", code: 1, userInfo: [NSLocalizedDescriptionKey: "socket() failed"])
         }
@@ -61,27 +58,27 @@ class HTTPServer {
         var reuse: Int32 = 1
         setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, socklen_t(MemoryLayout<Int32>.size))
 
-        // Bind
-        var addr = sockaddr_in6()
-        addr.sin6_family = sa_family_t(AF_INET6)
-        addr.sin6_port = UInt16(port).bigEndian
-        addr.sin6_addr = in6addr_any // bind to all interfaces
+        // Bind to 127.0.0.1 (IPv4 loopback)
+        var addr4 = sockaddr_in()
+        addr4.sin_family = sa_family_t(AF_INET)
+        addr4.sin_port = UInt16(port).bigEndian
+        addr4.sin_addr.s_addr = UInt32(0x0100007F).bigEndian // 127.0.0.1
 
-        let bindResult = withUnsafePointer(to: &addr) { ptr in
+        let bindResult = withUnsafePointer(to: &addr4) { ptr in
             ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sa in
-                bind(listenSocket, sa, socklen_t(MemoryLayout<sockaddr_in6>.size))
+                bind(listenSocket, sa, socklen_t(MemoryLayout<sockaddr_in>.size))
             }
         }
 
         if bindResult < 0 {
-            // Fallback to IPv4
+            // Fallback: bind to all interfaces
             close(listenSocket)
             listenSocket = socket(AF_INET, SOCK_STREAM, 0)
-            var addr4 = sockaddr_in()
-            addr4.sin_family = sa_family_t(AF_INET)
-            addr4.sin_port = UInt16(port).bigEndian
-            addr4.sin_addr.s_addr = INADDR_ANY.bigEndian
-            let r = withUnsafePointer(to: &addr4) { ptr in
+            var addrAny = sockaddr_in()
+            addrAny.sin_family = sa_family_t(AF_INET)
+            addrAny.sin_port = UInt16(port).bigEndian
+            addrAny.sin_addr.s_addr = INADDR_ANY.bigEndian
+            let r = withUnsafePointer(to: &addrAny) { ptr in
                 ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sa in
                     bind(listenSocket, sa, socklen_t(MemoryLayout<sockaddr_in>.size))
                 }
