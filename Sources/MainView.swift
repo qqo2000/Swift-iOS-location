@@ -221,12 +221,15 @@ struct MainView: View {
 
     private var serverConfigSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("代理软件配置地址").font(.caption.bold())
+            Text("GitHub CDN 模块下载（推荐）").font(.caption.bold())
+            configRow(title: "Shadowrocket", value: "https://cdn.jsdelivr.net/gh/qqo2000/Swift-iOS-location@main/ios-location-spoofer.sgmodule")
+            
+            Text("本地服务器配置地址").font(.caption.bold()).padding(.top, 4)
             configRow(title: "Script-Path", value: "\(server.serverAddress)/js/location-spoofer.js?token=\(locationManager.token)")
             configRow(title: "ConfigUrl", value: "\(server.serverAddress)/loc.json?token=\(locationManager.token)")
             configRow(title: "状态页", value: "\(server.serverAddress)/status?token=\(locationManager.token)")
 
-            Text("模块下载（自动填入地址）").font(.caption.bold()).padding(.top, 4)
+            Text("本地模块下载").font(.caption.bold()).padding(.top, 4)
             HStack(spacing: 4) {
                 moduleLink("Shadowrocket", ".sgmodule")
                 moduleLink("Loon", ".lnplugin")
