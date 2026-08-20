@@ -145,8 +145,7 @@ class HTTPServerManager: ObservableObject {
                 DispatchQueue.main.async {
                     self.isRunning = true
                     self.statusMessage = "运行中"
-                    let ip = self.getIPAddress() ?? "127.0.0.1"
-                    self.serverAddress = "http://\(ip):\(port)"
+                    self.serverAddress = "http://127.0.0.1:\(port)"
                 }
             } catch {
                 DispatchQueue.main.async {
