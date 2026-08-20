@@ -1,0 +1,84 @@
+name: Build iOS IPA
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: LocationSpoofer
+  BUNDLE_ID: com.locationspoofer.app
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: |
+          cd ${{ github.workspace }}
+          xcodegen generate
+
+      - name: Build App (unsigned)
+        run: |
+          xcodebuild \
+            -project ${{ env.PROJECT_NAME }}.xcodeproj \
+            -scheme ${{ env.PROJECT_NAME }} \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            PROVISIONING_PROFILE="" \
+            | tail -20
+
+      - name: Create IPA from .app
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/${{ env.PROJECT_NAME }}.app"
+          echo "App path: $APP_PATH"
+          ls -la "$APP_PATH"
+
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r ${{ env.PROJECT_NAME }}.ipa Payload
+
+          ls -la ${{ env.PROJECT_NAME }}.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LocationSpoofer-ipa
+          path: ${{ env.PROJECT_NAME }}.ipa
+          retention-days: 30
+
+      - name: Release on tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.PROJECT_NAME }}.ipa
+          name: ${{ github.ref_name }}
+          body: |
+            ## LocationSpoofer ${{ github.ref_name }}
+
+            ### 安装方法
+            1. 下载 .ipa 文件
+            2. 使用 Sideloadly / AltStore / TrollStore 安装到 iPhone
+            3. 设置 → 通用 → VPN与设备管理 → 信任开发者证书
+
+            ### 使用步骤
+            1. 打开 App → 服务器自动运行
+            2. 地图上点位置 → 保存定位
+            3. 复制 Script-Path 和 ConfigUrl 地址
+            4. 在代理软件中导入模块（或用 App 生成的 URL）
+            5. 开启 MITM + 信任证书 → 重连 VPN → 开关定位
+          draft: false
+          prerelease: false
