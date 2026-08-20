@@ -2,7 +2,7 @@ name: LocationSpoofer
 options:
   bundleIdPrefix: com.locationspoofer
   deploymentTarget:
-    iOS: "14.0"
+    iOS: "15.0"
   createIntermediateGroups: true
 
 settings:
@@ -10,12 +10,15 @@ settings:
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
-    IPHONEOS_DEPLOYMENT_TARGET: "14.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
     TARGETED_DEVICE_FAMILY: "1,2"
     CODE_SIGN_STYLE: Manual
     CODE_SIGN_IDENTITY: ""
     CODE_SIGNING_REQUIRED: NO
     CODE_SIGNING_ALLOWED: NO
+    DEVELOPMENT_TEAM: ""
+    PROVISIONING_PROFILE_SPECIFIER: ""
+    PROVISIONING_PROFILE: ""
 
 targets:
   LocationSpoofer:
@@ -32,14 +35,17 @@ targets:
       properties:
         CFBundleDisplayName: 定位欺骗
         UILaunchScreen: {}
-        NSLocalNetworkUsageDescription: App 需要本地网络权限来运行内置 HTTP 服务器
-        NSLocationWhenInUseUsageDescription: 用于在地图上显示当前位置
+        NSLocalNetworkUsageDescription: App 需要本地网络权限来运行内置 HTTP 服务器，供代理软件读取脚本和坐标配置。
+        NSLocationWhenInUseUsageDescription: 用于在地图上显示当前位置。
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+        UIBackgroundModes:
+          - fetch
+        LSRequiresIPhoneOS: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.locationspoofer.app
+        GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Resources/Info.plist
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

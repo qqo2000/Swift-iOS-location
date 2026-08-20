@@ -73,7 +73,7 @@ struct MainView: View {
                 TextField("名称", text: $saveLocationName)
                 Button("收藏") {
                     locationManager.addSavedLocation(
-                        name: saveLocationName.isEmpty ? "\(pinLocation.latitude, 4)" : saveLocationName,
+                        name: saveLocationName.isEmpty ? String(format: "%.4f", pinLocation.latitude) : saveLocationName,
                         lat: pinLocation.latitude,
                         lng: pinLocation.longitude,
                         alt: Int(altitude),
@@ -93,20 +93,22 @@ struct MainView: View {
                     .environmentObject(server)
                     .environmentObject(locationManager)
             }
-            .overlay {
-                if showingCopyToast {
-                    VStack {
-                        Spacer()
-                        Text(copyToastText)
-                            .padding(.horizontal, 16).padding(.vertical, 10)
-                            .background(Color.black.opacity(0.85))
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .padding(.bottom, 30)
+            .overlay(
+                Group {
+                    if showingCopyToast {
+                        VStack {
+                            Spacer()
+                            Text(copyToastText)
+                                .padding(.horizontal, 16).padding(.vertical, 10)
+                                .background(Color.black.opacity(0.85))
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                                .padding(.bottom, 30)
+                        }
+                        .transition(.opacity)
                     }
-                    .transition(.opacity)
                 }
-            }
+            )
             .onAppear {
                 loadCurrentConfig()
                 region.center = CLLocationCoordinate2D(
@@ -152,7 +154,7 @@ struct MainView: View {
                 Circle()
                     .fill(Color.green)
                     .frame(width: 8, height: 8)
-                Text(String(format: "WGS-84: %.5f, %.5f  海拔 %@m"))
+                Text(String(format: "WGS-84: %.5f, %.5f  海拔 %dm", pinLocation.latitude, pinLocation.longitude, locationManager.config.altitude))
                     .font(.subheadline)
                     .foregroundColor(.primary)
             }

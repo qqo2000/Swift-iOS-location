@@ -134,7 +134,7 @@ class HTTPServer {
         let bytesRead = recv(clientSocket, &buffer, buffer.count, 0)
         if bytesRead <= 0 { return }
 
-        let requestData = Data(buffer[0..<bytesFound])
+        let requestData = Data(buffer[0..<bytesRead])
         guard let requestStr = String(data: requestData, encoding: .utf8) else {
             // Binary data - handle as raw bytes for POST body
             return
@@ -240,13 +240,12 @@ class HTTPServer {
         responseData.append(response.body)
 
         let _ = responseData.withUnsafeBytes { (buf: UnsafeRawBufferPointer) -> Int in
-            return send(clientSocket, buf.baseAddress, buf.count, 0)
+            guard let base = buf.baseAddress else { return 0 }
+            return send(clientSocket, base, buf.count, 0)
         }
     }
 
     // MARK: - Utilities
-
-    private var bytesFound: Int = 0
 
     private func pathMatches(_ pattern: String, _ path: String) -> Bool {
         // Normalize: strip trailing slash
