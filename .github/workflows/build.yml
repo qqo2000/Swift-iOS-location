@@ -18,7 +18,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install XcodeGen
-        run: brew install xcodegen
+        env:
+          HOMEBREW_NO_REQUIRE_TAP_TRUST: "1"
+        run: |
+          brew untap aws/tap 2>/dev/null || true
+          brew install xcodegen
 
       - name: Generate Xcode Project
         run: |
@@ -27,6 +31,7 @@ jobs:
 
       - name: Build App (unsigned)
         run: |
+          set -o pipefail
           xcodebuild \
             -project ${{ env.PROJECT_NAME }}.xcodeproj \
             -scheme ${{ env.PROJECT_NAME }} \
@@ -39,7 +44,13 @@ jobs:
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             PROVISIONING_PROFILE="" \
-            | tail -20
+            2>&1 | tee build.log | tail -60
+
+      - name: Show full build log on failure
+        if: failure()
+        run: |
+          echo "=== Build failed, showing last 200 lines ==="
+          tail -200 build.log || true
 
       - name: Create IPA from .app
         run: |
@@ -60,8 +71,16 @@ jobs:
           path: ${{ env.PROJECT_NAME }}.ipa
           retention-days: 30
 
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 7
+
       - name: Release on tag
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && success()
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.PROJECT_NAME }}.ipa
